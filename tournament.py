@@ -22,7 +22,8 @@ def deleteMatches():
     """Remove all the match records from the database."""
     db, cursor = connect()
 
-    cursor.execute("TRUNCATE TABLE matches")
+    query = "TRUNCATE TABLE matches"
+    cursor.execute(query)
 
     db.commit()
     db.close()
@@ -32,7 +33,8 @@ def deletePlayers():
     """Remove all the player records from the database."""
     db, cursor = connect()
 
-    cursor.execute("TRUNCATE TABLE players CASCADE")
+    query = "TRUNCATE TABLE players CASCADE"
+    cursor.execute(query)
 
     db.commit()
     db.close()
@@ -42,8 +44,10 @@ def countPlayers():
     """Returns the number of players currently registered."""
     db, cursor = connect()
 
-    cursor.execute("SELECT count(1) from players")
+    query = "SELECT count(1) from players"
+    cursor.execute(query)
     cnt = int(cursor.fetchone()[0])
+
     db.close()
     return cnt
 
@@ -59,7 +63,9 @@ def registerPlayer(name):
     """
     db, cursor = connect()
 
-    cursor.execute("INSERT INTO players (name) VALUES (%s)", (name,))
+    query = "INSERT INTO players (name) VALUES (%s)"
+    params = (name,)
+    cursor.execute(query, params)
 
     db.commit()
     db.close()
@@ -80,8 +86,10 @@ def playerStandings():
     """
     db, cursor = connect()
 
-    cursor.execute("SELECT * FROM v_standings")
+    query = "SELECT * FROM v_standings"
+    cursor.execute(query)
     rows = cursor.fetchall()
+
     db.close()
     return rows
 
@@ -95,8 +103,11 @@ def reportMatch(winner, loser):
     """
     db, cursor = connect()
 
-    cursor.execute('''INSERT INTO matches (winner, loser)
-                    VALUES (%s, %s)''', (winner, loser,))
+    query = '''INSERT INTO matches (winner, loser)
+                VALUES (%s, %s)'''
+    params = (winner, loser,)
+    cursor.execute(query, params)
+
     db.commit()
     db.close()
 
