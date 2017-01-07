@@ -16,19 +16,19 @@ def deleteMatches():
     db = connect()
     c = db.cursor()
     c.execute("DELETE from matches")
-    c.execute("UPDATE standings SET matches = 0, wins = 0")
     db.commit()
     db.close()
+
 
 def deletePlayers():
     """Remove all the player records from the database."""
     db = connect()
     c = db.cursor()
     # TBD: cascade deletion in DB?
-    c.execute("DELETE from standings")
     c.execute("DELETE from players")
     db.commit()
     db.close()
+
 
 def countPlayers():
     """Returns the number of players currently registered."""
@@ -38,6 +38,7 @@ def countPlayers():
     cnt = int(c.fetchone()[0])
     db.close()
     return cnt
+
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -50,11 +51,10 @@ def registerPlayer(name):
     """
     db = connect()
     c = db.cursor()
-    # TBD: trigger insert into standings in DB for a new player
     c.execute("INSERT INTO players (name) VALUES (%s)", (name,))
-    c.execute("INSERT INTO standings (player_id) SELECT id FROM players WHERE name = (%s)", (name,))
     db.commit()
     db.close()
+
 
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
@@ -71,8 +71,7 @@ def playerStandings():
     """
     db = connect()
     c = db.cursor()
-    c.execute('''SELECT p.id, p.name, s.wins, s.matches FROM players p, standings s
-                WHERE p.id = s.player_id ORDER BY s.wins DESC''')
+    c.execute("SELECT * FROM v_standings")
     rows = c.fetchall()
     db.close()
     return rows
@@ -87,11 +86,11 @@ def reportMatch(winner, loser):
     """
     db = connect()
     c = db.cursor()
-    c.execute("INSERT INTO matches (winner, loser) VALUES (%s, %s)", (winner, loser))
-    c.execute("UPDATE standings SET matches = matches + 1 WHERE player_id IN (%s, %s)", (winner, loser))
-    c.execute("UPDATE standings SET wins = wins + 1 WHERE player_id = (%s)", (winner,))
+    c.execute('''INSERT INTO matches (winner, loser)
+                    VALUES (%s, %s)''', (winner, loser,))
     db.commit()
     db.close()
+
 
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
