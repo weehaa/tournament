@@ -16,6 +16,4 @@ CREATE TABLE matches (winner INTEGER REFERENCES players(id),
 CREATE TABLE standings (player_id INTEGER REFERENCES players(id),
                         wins INTEGER default 0,
                         matches INTEGER default 0);
-ALTER TABLE players add column wins INTEGER default 0;
-ALTER TABLE players add column matches INTEGER default 0;
 ALTER TABLE matches add column id SERIAL;
