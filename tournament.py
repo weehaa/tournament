@@ -24,6 +24,7 @@ def deletePlayers():
     """Remove all the player records from the database."""
     db = connect()
     c = db.cursor()
+    # TBD: cascade deletion in DB?
     c.execute("DELETE from standings")
     c.execute("DELETE from players")
     db.commit()
@@ -49,6 +50,7 @@ def registerPlayer(name):
     """
     db = connect()
     c = db.cursor()
+    # TBD: trigger insert into standings in DB for a new player
     c.execute("INSERT INTO players (name) VALUES (%s)", (name,))
     c.execute("INSERT INTO standings (player_id) SELECT id FROM players WHERE name = (%s)", (name,))
     db.commit()
@@ -106,12 +108,8 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-    # paired = []
-    # db = connect()
-    # c = db.cursor()
-    # c.execute('''SELECT p1.id, p1.name, p2.id, p2.name FROM players p1, players p2
-    #             where  p1.wins = p2.wins and p1.matches = p2.matches and p1.id < p2.id
-    #             limit 2''')
-    # rows = c.fetchall()
-    # db.close()
-    # return rows
+    pairs = []
+    s = playerStandings()
+    for i in range(0, len(s), 2):
+        pairs.append((s[i][0], s[i][1], s[i+1][0], s[i+1][1]))
+    return pairs
